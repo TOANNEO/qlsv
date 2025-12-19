@@ -1,8 +1,10 @@
 package com.example.qlsv.infrastructure.web.controller;
 
 import com.example.qlsv.application.dto.request.LoginRequest;
+import com.example.qlsv.application.dto.request.RegisterStudentAccountRequest;
 import com.example.qlsv.application.dto.request.RegisterStudentRequest;
 import com.example.qlsv.application.dto.response.JwtAuthResponse;
+import com.example.qlsv.application.dto.response.UserResponse;
 import com.example.qlsv.application.service.UserService;
 import com.example.qlsv.domain.model.User;
 import com.example.qlsv.infrastructure.security.CustomUserDetails;
@@ -14,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,6 +60,13 @@ public class AuthController {
                 user.getEmail(),        // 5. email
                 user.getRole().name()   // 6. role
         ));
+    }
+
+    @PostMapping("/register-student")
+    public ResponseEntity<UserResponse> registerStudent(
+            @Valid @RequestBody RegisterStudentAccountRequest request) {
+        UserResponse userResponse = userService.registerStudent(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
     }
 
     // Nếu bạn có hàm register thì giữ nguyên, hoặc copy lại nếu cần

@@ -66,6 +66,16 @@ public class SecurityConfig {
                         // Cho phép tất cả mọi người truy cập API login
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/users/**").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/register",
+                                "/register/**",
+                                "/css/**",
+                                "/js/**",
+                                "/assets/**",
+                                "/favicon.ico"
+                        ).permitAll()
                         // (Tùy chọn) Cho phép truy cập Swagger/OpenAPI
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         // Tất cả các request khác đều phải xác thực
