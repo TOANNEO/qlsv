@@ -15,12 +15,10 @@ public interface CourseService {
     CourseResponse getCourseById(Long id);
     void deleteCourse(Long id);
 
-    List<CourseResponse> getCoursesByLecturer(Long userId);
+    List<CourseResponse> loadLecturerCourses(Long userId);
+    List<SimpleStudentResponse> loadStudentsInCourse(Long courseId);
 
-    // [FIX 6] Tên hàm chuẩn
-    List<SimpleStudentResponse> getStudentsByCourse(Long courseId);
-
-    List<StudentAttendanceStat> getCourseStatistics(Long courseId);
+    List<StudentAttendanceStat> loadCourseStats(Long courseId);
     void sendBanNotifications(Long courseId);
-    ByteArrayInputStream exportCourseStatsToExcel(Long courseId);
+    ByteArrayInputStream exportCourseStats(Long courseId);
 }

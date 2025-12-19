@@ -146,7 +146,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<CourseResponse> getCoursesByLecturer(Long userId) {
+    public List<CourseResponse> loadLecturerCourses(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
@@ -155,7 +155,7 @@ public class CourseServiceImpl implements CourseService {
                 .collect(Collectors.toList());
     }
     @Override
-    public List<SimpleStudentResponse> getStudentsByCourse(Long courseId) {
+    public List<SimpleStudentResponse> loadStudentsInCourse(Long courseId) {
         if (!courseRepository.existsById(courseId)) {
             throw new ResourceNotFoundException("Course", "id", courseId);
         }
@@ -166,7 +166,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<StudentAttendanceStat> getCourseStatistics(Long courseId) {
+    public List<StudentAttendanceStat> loadCourseStats(Long courseId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
 
@@ -217,7 +217,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void sendBanNotifications(Long courseId) {
-        List<StudentAttendanceStat> stats = getCourseStatistics(courseId);
+        List<StudentAttendanceStat> stats = loadCourseStats(courseId);
         Course course = courseRepository.findById(courseId).orElseThrow();
 
         for (StudentAttendanceStat stat : stats) {
@@ -236,8 +236,8 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public ByteArrayInputStream exportCourseStatsToExcel(Long courseId) {
-        List<StudentAttendanceStat> stats = getCourseStatistics(courseId);
+    public ByteArrayInputStream exportCourseStats(Long courseId) {
+        List<StudentAttendanceStat> stats = loadCourseStats(courseId);
         String[] columns = {"Mã SV", "Họ Tên", "Tổng buổi", "Đã học", "Vắng", "% Vắng", "Cấm thi"};
 
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
