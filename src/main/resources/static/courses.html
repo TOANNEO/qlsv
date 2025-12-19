@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Lớp học phần</title>
+    <style>
+        :root {
+            font-family: Arial, sans-serif;
+            background: #f6f8fb;
+            color: #1f2933;
+        }
+        body {
+            margin: 0;
+            padding: 1.5rem;
+        }
+        h1, h2 {
+            margin: 0 0 0.75rem 0;
+        }
+        section {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+        input, select, button, textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.5rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        button {
+            width: auto;
+            cursor: pointer;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            transition: background 0.2s ease;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .course-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0.75rem;
+            background: #fafafa;
+        }
+        .course-card h3 {
+            margin-top: 0;
+        }
+        .actions button {
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        #toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #fff;
+            display: none;
+            min-width: 240px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            z-index: 999;
+        }
+        .toast-success { background: #16a34a; }
+        .toast-error { background: #dc2626; }
+        .muted { color: #6b7280; font-size: 13px; }
+        ul { padding-left: 1.1rem; margin-top: 0; }
+        .pill {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #075985;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-right: 4px;
+        }
+        .danger { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+<h1>Trang Lớp học phần</h1>
+
+<section>
+    <h2>Thông tin phiên</h2>
+    <label for="token">Bearer Token</label>
+    <input id="token" type="text" placeholder="Dán token sau khi đăng nhập">
+
+    <div class="grid">
+        <div>
+            <label for="lecturerId">Lecturer ID (cho 'Giảng viên của tôi')</label>
+            <input id="lecturerId" type="number" placeholder="VD: 5">
+        </div>
+        <div>
+            <label for="studentId">Student ID (để xem lớp của tôi - nếu cần)</label>
+            <input id="studentId" type="number" placeholder="Tùy chọn">
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>Admin/Thư ký: Tạo lớp học phần</h2>
+    <div class="grid">
+        <div>
+            <label for="courseCode">Mã lớp học phần</label>
+            <input id="courseCode" placeholder="INT3306.1">
+        </div>
+        <div>
+            <label for="subjectId">Subject ID</label>
+            <input id="subjectId" type="number" placeholder="Nhập ID môn">
+        </div>
+        <div>
+            <label for="semesterId">Semester ID</label>
+            <input id="semesterId" type="number" placeholder="Nhập ID kỳ học">
+        </div>
+    </div>
+    <div class="grid">
+        <div>
+            <label for="lecturerCodes">Mã giảng viên (cách nhau bởi dấu phẩy)</label>
+            <input id="lecturerCodes" placeholder="GV001,GV002">
+        </div>
+        <div>
+            <label for="dayOfWeek">Thứ (MONDAY ... SUNDAY)</label>
+            <input id="dayOfWeek" placeholder="MONDAY">
+        </div>
+        <div>
+            <label for="startTime">Giờ bắt đầu (HH:mm)</label>
+            <input id="startTime" placeholder="07:30">
+        </div>
+        <div>
+            <label for="endTime">Giờ kết thúc (HH:mm)</label>
+            <input id="endTime" placeholder="09:30">
+        </div>
+    </div>
+    <button onclick="createCourse()">Tạo lớp học phần</button>
+    <p class="muted">Tải sẵn danh sách môn/kỳ nếu cần bằng nút phía dưới.</p>
+    <div class="actions">
+        <button onclick="loadSubjects()">Tải danh sách môn</button>
+        <button onclick="loadSemesters()">Tải danh sách kỳ</button>
+    </div>
+    <pre id="subjectsList" class="muted"></pre>
+    <pre id="semestersList" class="muted"></pre>
+</section>
+
+<section>
+    <h2>Admin/Thư ký: Ghi danh sinh viên</h2>
+    <div class="grid">
+        <div>
+            <label for="studentCode">Mã sinh viên</label>
+            <input id="studentCode" placeholder="SV12345">
+        </div>
+        <div>
+            <label for="courseIdRegister">Course ID</label>
+            <input id="courseIdRegister" type="number" placeholder="Nhập ID lớp">
+        </div>
+    </div>
+    <button onclick="registerStudent()">Ghi danh</button>
+</section>
+
+<section>
+    <h2>Tất cả lớp học phần (Admin/Thư ký)</h2>
+    <button onclick="loadAllCourses()">Tải danh sách lớp</button>
+    <div id="coursesGrid" class="grid"></div>
+</section>
+
+<section>
+    <h2>Giảng viên của tôi</h2>
+    <button onclick="loadLecturerCourses()">Xem lớp của giảng viên</button>
+    <div id="lecturerCourses" class="grid"></div>
+</section>
+
+<div id="toast"></div>
+
+<script>
+    const apiBase = '/api/v1/courses';
+
+    function authHeaders() {
+        const token = document.getElementById('token').value.trim();
+        return token ? { 'Authorization': 'Bearer ' + token } : {};
+    }
+
+    function showToast(message, success = true) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = success ? 'toast-success' : 'toast-error';
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 3000);
+    }
+
+    async function createCourse() {
+        const body = {
+            courseCode: document.getElementById('courseCode').value.trim(),
+            subjectId: Number(document.getElementById('subjectId').value),
+            semesterId: Number(document.getElementById('semesterId').value),
+            lecturerCodes: document.getElementById('lecturerCodes').value.split(',').map(v => v.trim()).filter(Boolean),
+            dayOfWeek: document.getElementById('dayOfWeek').value.trim(),
+            startTime: document.getElementById('startTime').value.trim(),
+            endTime: document.getElementById('endTime').value.trim()
+        };
+        await apiCall(apiBase, 'POST', body, 'Tạo lớp thành công');
+        loadAllCourses();
+    }
+
+    async function registerStudent() {
+        const body = {
+            studentCode: document.getElementById('studentCode').value.trim(),
+            courseId: Number(document.getElementById('courseIdRegister').value)
+        };
+        await apiCall(`${apiBase}/register-student`, 'POST', body, 'Ghi danh thành công');
+        loadAllCourses();
+    }
+
+    async function loadAllCourses() {
+        const courses = await apiCall(apiBase, 'GET');
+        if (!courses) return;
+        renderCourses(courses, document.getElementById('coursesGrid'));
+    }
+
+    async function loadLecturerCourses() {
+        const lecturerId = document.getElementById('lecturerId').value.trim();
+        if (!lecturerId) {
+            showToast('Nhập Lecturer ID trước khi tải lớp', false);
+            return;
+        }
+        const courses = await apiCall(`${apiBase}/by-lecturer/${lecturerId}`, 'GET');
+        if (!courses) return;
+        renderCourses(courses, document.getElementById('lecturerCourses'));
+    }
+
+    function renderCourses(courses, container) {
+        container.innerHTML = '';
+        courses.forEach(course => {
+            const div = document.createElement('div');
+            div.className = 'course-card';
+            const lecturerNames = (course.lecturers || []).map(l => `${l.lastName || ''} ${l.firstName || ''}`.trim()).filter(Boolean).join(', ');
+            div.innerHTML = `
+                <h3>${course.courseCode}</h3>
+                <p class="muted">Subject: ${course.subject?.name || '-'} | Semester: ${course.semester?.name || '-'}</p>
+                <p class="muted">Lịch học: ${course.dayOfWeek || '-'} ${course.startTime || ''}-${course.endTime || ''}</p>
+                <p class="muted">Giảng viên: ${lecturerNames || '-'}</p>
+                <div class="actions">
+                    <button onclick="loadStudents(${course.id})">Danh sách SV</button>
+                    <button onclick="loadStats(${course.id})">Thống kê</button>
+                    <button onclick="downloadExcel(${course.id})">Xuất Excel</button>
+                    <button onclick="sendBan(${course.id})" class="danger">Thông báo cấm thi</button>
+                </div>
+                <div id="students-${course.id}"></div>
+                <div id="stats-${course.id}"></div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    async function loadStudents(courseId) {
+        const students = await apiCall(`${apiBase}/${courseId}/students`, 'GET');
+        if (!students) return;
+        const container = document.getElementById(`students-${courseId}`);
+        container.innerHTML = '<strong>Sinh viên:</strong>' +
+            '<ul>' + students.map(s => `<li>${s.studentCode} - ${s.lastName || ''} ${s.firstName || ''} (${s.email || ''})</li>`).join('') + '</ul>';
+    }
+
+    async function loadStats(courseId) {
+        const stats = await apiCall(`${apiBase}/${courseId}/statistics`, 'GET');
+        if (!stats) return;
+        const container = document.getElementById(`stats-${courseId}`);
+        container.innerHTML = '<strong>Thống kê:</strong>' +
+            '<ul>' + stats.map(s => {
+                const banned = (s.isBanned !== undefined) ? s.isBanned : s.banned;
+                return `<li>${s.studentName}: Vắng ${s.absentSessions}/${s.totalSessions} (${s.absentPercentage}%) ${
+                    banned ? '<span class="pill danger">Cấm thi</span>' : ''}</li>`;
+            }).join('') + '</ul>';
+    }
+
+    async function downloadExcel(courseId) {
+        const res = await fetch(`${apiBase}/${courseId}/export-excel`, {
+            method: 'GET',
+            headers: { ...authHeaders() }
+        });
+        if (!res.ok) {
+            showToast('Xuất Excel thất bại', false);
+            return;
+        }
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `thong_ke_${courseId}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        showToast('Đã tải file Excel');
+    }
+
+    async function sendBan(courseId) {
+        await apiCall(`${apiBase}/${courseId}/send-ban-notifications`, 'POST', {}, 'Đã gửi thông báo cấm thi');
+    }
+
+    async function loadSubjects() {
+        const res = await apiCall('/api/v1/subjects', 'GET');
+        if (res) {
+            document.getElementById('subjectsList').textContent = JSON.stringify(res, null, 2);
+        }
+    }
+
+    async function loadSemesters() {
+        const res = await apiCall('/api/v1/semesters', 'GET');
+        if (res) {
+            document.getElementById('semestersList').textContent = JSON.stringify(res, null, 2);
+        }
+    }
+
+    async function apiCall(url, method, body, successMessage) {
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...authHeaders()
+                },
+                body: method === 'GET' ? undefined : JSON.stringify(body || {})
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                showToast(text || 'Đã xảy ra lỗi', false);
+                return null;
+            }
+            if (successMessage) showToast(successMessage, true);
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                return response.json();
+            }
+            return null;
+        } catch (e) {
+            showToast(e.message, false);
+            return null;
+        }
+    }
+</script>
+</body>
+</html>

@@ -83,20 +83,20 @@ public class CourseController {
     @GetMapping("/{id}/students")
     @PreAuthorize("hasAnyRole('ADMIN', 'SECRETARY', 'LECTURER')")
     public ResponseEntity<List<SimpleStudentResponse>> getStudentsInCourse(@PathVariable Long id) {
-        return ResponseEntity.ok(courseService.getStudentsByCourse(id));
+        return ResponseEntity.ok(courseService.loadStudentsInCourse(id));
     }
 
     @GetMapping("/by-lecturer/{lecturerId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'SECRETARY', 'LECTURER')")
     public ResponseEntity<List<CourseResponse>> getCoursesByLecturer(@PathVariable Long lecturerId) {
-        return ResponseEntity.ok(courseService.getCoursesByLecturer(lecturerId));
+        return ResponseEntity.ok(courseService.loadLecturerCourses(lecturerId));
     }
 
 
     @GetMapping("/{id}/statistics")
     @PreAuthorize("hasAnyRole('ADMIN', 'SECRETARY', 'LECTURER')")
     public ResponseEntity<List<StudentAttendanceStat>> getCourseStats(@PathVariable Long id) {
-        return ResponseEntity.ok(courseService.getCourseStatistics(id));
+        return ResponseEntity.ok(courseService.loadCourseStats(id));
     }
 
     @PostMapping("/{id}/send-ban-notifications")
@@ -106,9 +106,9 @@ public class CourseController {
         return ResponseEntity.ok("Đã gửi lệnh gửi email.");
     }
     @GetMapping("/{id}/export-excel")
-    //@PreAuthorize("hasAnyRole('ADMIN', 'LECTURER', 'SECRETARY')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LECTURER', 'SECRETARY')")
     public ResponseEntity<InputStreamResource> exportExcel(@PathVariable Long id) {
-        ByteArrayInputStream in = courseService.exportCourseStatsToExcel(id);
+        ByteArrayInputStream in = courseService.exportCourseStats(id);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=thong_ke_lop_" + id + ".xlsx");
