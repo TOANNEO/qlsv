@@ -1,7 +1,4 @@
 package com.example.qlsv.application.dto.mapper;
-import com.example.qlsv.application.mapper.UserMapper;
-import com.example.qlsv.application.dto.mapper.SemesterMapper;
-import com.example.qlsv.application.dto.mapper.SubjectMapper;
 import com.example.qlsv.application.dto.response.CourseResponse;
 import com.example.qlsv.domain.model.Course;
 import org.mapstruct.Mapper;
