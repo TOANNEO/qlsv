@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý điểm danh</title>
+  <link rel="stylesheet" href="styles/attendance.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page-title">
+      <h1>Quản lý điểm danh</h1>
+      <span class="badge">Giảng viên / Quản trị</span>
+    </div>
+
+    <div id="alertBox" class="alert alert-info" hidden></div>
+
+    <div class="layout">
+      <div class="card">
+        <h2>Chọn khoá học</h2>
+        <form id="courseForm">
+          <div class="form-row">
+            <div>
+              <label for="courseId">Mã khoá học</label>
+              <input id="courseId" name="courseId" type="number" placeholder="VD: 101" required />
+            </div>
+            <button type="submit" class="btn-primary">Tải phiên điểm danh</button>
+          </div>
+        </form>
+
+        <h3>Danh sách phiên</h3>
+        <div id="sessionsList"></div>
+      </div>
+
+      <div class="card" id="recordsPanel">
+        <div class="panel-head">
+          <div>
+            <h2>Bản ghi điểm danh</h2>
+            <p id="sessionMeta" class="muted">Chọn một phiên để xem danh sách sinh viên.</p>
+          </div>
+          <div>
+            <label for="sessionSelect">Phiên hiện tại</label>
+            <select id="sessionSelect">
+              <option value="">---</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Sinh viên</th>
+                <th>Giờ điểm danh</th>
+                <th>Trạng thái</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="recordsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/pages/attendancePage.js"></script>
+</body>
+</html>
