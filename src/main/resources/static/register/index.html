@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Student</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css"
+          integrity="sha512-yV4nUD6zR/5ZrV3UzB36Uq68u+Bjl0QZokfi0aypWOSgVxt+MEWQHCHE4MBmwiFZbBCQudUI80MP0tP8zAKIpg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fb;
+        }
+
+        .container {
+            max-width: 540px;
+            margin: 60px auto;
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        h3 {
+            margin-top: 0;
+        }
+
+        .status {
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h3>Đăng ký tài khoản Sinh viên</h3>
+    <p>Nhập thông tin theo yêu cầu để tạo tài khoản sinh viên.</p>
+    <form id="register-form">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required minlength="3" maxlength="50">
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="studentCode">Mã sinh viên</label>
+        <input type="text" id="studentCode" name="studentCode" required>
+
+        <label for="firstName">Họ</label>
+        <input type="text" id="firstName" name="firstName" required minlength="3" maxlength="50">
+
+        <label for="lastName">Tên</label>
+        <input type="text" id="lastName" name="lastName" required minlength="3" maxlength="50">
+
+        <label for="password">Mật khẩu</label>
+        <input type="password" id="password" name="password" required minlength="6" maxlength="100">
+
+        <button type="submit">Đăng ký</button>
+    </form>
+    <div id="status" class="status"></div>
+</div>
+
+<script>
+    const authRepository = {
+        async registerStudent(payload) {
+            const response = await fetch('/api/v1/auth/register-student', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                const message = data.message || 'Đăng ký thất bại. Vui lòng thử lại.';
+                throw new Error(message);
+            }
+            return data;
+        }
+    };
+
+    const form = document.getElementById('register-form');
+    const status = document.getElementById('status');
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        status.textContent = 'Đang xử lý...';
+        status.style.color = '#333';
+
+        const payload = {
+            username: form.username.value.trim(),
+            email: form.email.value.trim(),
+            studentCode: form.studentCode.value.trim(),
+            firstName: form.firstName.value.trim(),
+            lastName: form.lastName.value.trim(),
+            password: form.password.value
+        };
+
+        try {
+            await authRepository.registerStudent(payload);
+            status.textContent = 'Đăng ký thành công! Bạn có thể đăng nhập ngay.';
+            status.style.color = '#117a65';
+            form.reset();
+        } catch (error) {
+            status.textContent = error.message;
+            status.style.color = '#c0392b';
+        }
+    });
+</script>
+</body>
+</html>

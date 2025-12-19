@@ -2,6 +2,7 @@ package com.example.qlsv.application.impl;
 
 import com.example.qlsv.application.dto.mapper.UserMapper;
 import com.example.qlsv.application.dto.request.CreateUserRequest;
+import com.example.qlsv.application.dto.request.RegisterStudentAccountRequest;
 import com.example.qlsv.application.dto.request.UpdateUserRequest;
 import com.example.qlsv.application.dto.response.UserResponse;
 import com.example.qlsv.application.service.UserService;
@@ -79,6 +80,20 @@ public class UserServiceImpl implements UserService {
         // 4. Lưu User
         User savedUser = userRepository.save(userBuilder.build());
         return userMapper.toResponse(savedUser);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse registerStudent(RegisterStudentAccountRequest request) {
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setUsername(request.getUsername());
+        createUserRequest.setPassword(request.getPassword());
+        createUserRequest.setEmail(request.getEmail());
+        createUserRequest.setFirstName(request.getFirstName());
+        createUserRequest.setLastName(request.getLastName());
+        createUserRequest.setStudentCode(request.getStudentCode());
+        createUserRequest.setRole("STUDENT");
+        return createUser(createUserRequest);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.example.qlsv.application.service;
 
 import com.example.qlsv.application.dto.request.CreateUserRequest;
+import com.example.qlsv.application.dto.request.RegisterStudentAccountRequest;
 import com.example.qlsv.application.dto.request.UpdateUserRequest; // <-- IMPORT MỚI
 import com.example.qlsv.application.dto.response.UserResponse;
 import org.springframework.data.domain.Page; // <-- IMPORT MỚI
@@ -10,6 +11,8 @@ public interface UserService {
 
     // (Đã có)
     UserResponse createUser(CreateUserRequest request);
+
+    UserResponse registerStudent(RegisterStudentAccountRequest request);
 
     // --- [MỚI] BỔ SUNG CÁC HÀM CRUD CÒN LẠI ---
 
